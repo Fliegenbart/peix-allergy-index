@@ -32,6 +32,10 @@ const elements = {
   channelPlan: document.querySelector("#channelPlan"),
   sourceTrace: document.querySelector("#sourceTrace"),
   sourceStatus: document.querySelector("#sourceStatus"),
+  methodologyStatus: document.querySelector("#methodologyStatus"),
+  methodologySummary: document.querySelector("#methodologySummary"),
+  methodologyVersion: document.querySelector("#methodologyVersion"),
+  methodologyWeights: document.querySelector("#methodologyWeights"),
   privacyMode: document.querySelector("#privacyMode"),
   flowCanvas: document.querySelector("#flowCanvas"),
   flowRegion: document.querySelector("#flowRegion"),
@@ -101,6 +105,7 @@ function render() {
 
   renderDetail(selected);
   renderSources(snapshot.sourceStatus);
+  renderMethodology(snapshot.methodology);
   renderFlowReadout(selected);
   startFlowAnimation(selected);
 }
@@ -166,6 +171,28 @@ function renderSources(sources) {
         </article>
       `
     )
+    .join("");
+}
+
+function renderMethodology(methodology) {
+  if (!methodology) return;
+  elements.methodologyStatus.textContent =
+    methodology.validationStatus === "heuristic_not_yet_backtested"
+      ? "mvp prior"
+      : methodology.validationStatus;
+  elements.methodologySummary.textContent = methodology.summary;
+  elements.methodologyVersion.textContent = methodology.version;
+  elements.methodologyWeights.innerHTML = Object.entries(methodology.components)
+    .map(([key, component]) => {
+      return `
+        <article class="weight-card">
+          <span class="weight-label">${escapeHtml(component.label)}</span>
+          <strong>${component.weightPct}%</strong>
+          <span class="mini-track"><span style="width:${component.weightPct}%"></span></span>
+          <span>${escapeHtml(formatEvidence(component.evidenceLevel))}</span>
+        </article>
+      `;
+    })
     .join("");
 }
 
@@ -300,6 +327,10 @@ function signed(value) {
 
 function formatToken(value) {
   return String(value || "").replaceAll("_", " ").toLowerCase();
+}
+
+function formatEvidence(value) {
+  return formatToken(value).replace("support", "evidence");
 }
 
 function escapeHtml(value) {

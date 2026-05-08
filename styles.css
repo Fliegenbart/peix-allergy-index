@@ -678,7 +678,8 @@ dd {
   padding: 0.48rem 0.68rem;
 }
 
-.source-panel {
+.source-panel,
+.methodology-panel {
   margin-top: 16px;
 }
 
@@ -711,6 +712,70 @@ dd {
   font-size: 0.78rem;
   font-weight: 620;
   line-height: 1.32;
+}
+
+.methodology-copy {
+  color: var(--muted);
+  font-size: 1rem;
+  line-height: 1.48;
+  max-width: 920px;
+  position: relative;
+  z-index: 1;
+}
+
+.weight-grid {
+  display: grid;
+  gap: 10px;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  margin-top: 16px;
+  position: relative;
+  z-index: 1;
+}
+
+.weight-card {
+  background: rgba(255, 255, 255, 0.58);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  display: grid;
+  gap: 9px;
+  min-height: 132px;
+  padding: 14px;
+}
+
+.weight-card strong {
+  font-size: 2rem;
+  font-weight: 760;
+  letter-spacing: -0.05em;
+  line-height: 0.92;
+}
+
+.weight-card span:last-child {
+  color: var(--muted);
+  font-size: 0.75rem;
+  font-weight: 640;
+  line-height: 1.25;
+}
+
+.weight-label {
+  color: var(--ink);
+  font-size: 0.82rem;
+  font-weight: 760;
+  line-height: 1.18;
+}
+
+.methodology-footer {
+  border-top: 1px solid var(--line);
+  color: var(--muted);
+  display: flex;
+  font-size: 0.78rem;
+  font-weight: 700;
+  gap: 14px;
+  justify-content: space-between;
+  margin-top: 16px;
+  padding-top: 14px;
+  position: relative;
+  text-transform: uppercase;
+  z-index: 1;
 }
 
 .empty-state {
@@ -794,7 +859,8 @@ dd {
   }
 
   .summary-grid,
-  .source-grid {
+  .source-grid,
+  .weight-grid {
     grid-template-columns: 1fr;
   }
 

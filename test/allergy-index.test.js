@@ -4,6 +4,8 @@ const assert = require("node:assert/strict");
 const {
   buildSnapshot,
   buildGoogleDemandSignals,
+  getMethodology,
+  INDEX_COMPONENT_WEIGHTS,
   parseApproxTraffic,
   parseDwdIndex,
   parseDwdPollen,
@@ -17,6 +19,39 @@ test("parseDwdIndex turns DWD ranges into numeric pressure", () => {
   assert.equal(parseDwdIndex("2-3"), 2.5);
   assert.equal(parseDwdIndex("3"), 3);
   assert.equal(parseDwdIndex(""), 0);
+});
+
+test("index component weights are explicit MVP priors and sum to one", () => {
+  const totalWeight = Object.values(INDEX_COMPONENT_WEIGHTS).reduce(
+    (sum, component) => sum + component.weight,
+    0
+  );
+
+  assert.equal(Math.round(totalWeight * 100), 100);
+  assert.equal(INDEX_COMPONENT_WEIGHTS.pollen.calibrationStatus, "mvp_prior");
+  assert.equal(INDEX_COMPONENT_WEIGHTS.weather.calibrationStatus, "mvp_prior");
+  assert.equal(INDEX_COMPONENT_WEIGHTS.demand.calibrationStatus, "mvp_prior");
+});
+
+test("snapshot exposes methodology so clients see that weights are not validated yet", () => {
+  const snapshot = buildSnapshot({
+    targetDate: "2026-05-09",
+    sourceStatus: [{ source: "DWD_POLLEN", status: "live" }],
+  });
+
+  assert.equal(snapshot.methodology.version, "mvp_prior_v1");
+  assert.equal(snapshot.methodology.validationStatus, "heuristic_not_yet_backtested");
+  assert.equal(snapshot.methodology.components.pollen.weightPct, 45);
+  assert.equal(snapshot.methodology.backtestRequiredBeforeAutomation, true);
+});
+
+test("methodology includes evidence rationale and calibration roadmap", () => {
+  const methodology = getMethodology();
+
+  assert.equal(methodology.components.airQuality.weightPct, 15);
+  assert.equal(methodology.components.airQuality.evidenceLevel, "mechanistic_support");
+  assert.equal(methodology.calibrationRoadmap.length >= 3, true);
+  assert.equal(methodology.calibrationTargets.includes("pharmacy_sellout"), true);
 });
 
 test("parseDwdPollen maps DWD combined regions onto Bundesland rows", () => {
