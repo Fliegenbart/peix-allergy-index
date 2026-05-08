@@ -1,0 +1,14 @@
+{
+  "name": "peix-allergy-index",
+  "version": "0.1.0",
+  "private": true,
+  "description": "PEIX Allergy Media Index MVP for contextual OTC allergy media activation.",
+  "scripts": {
+    "test": "node --test",
+    "local": "vercel dev --listen 3000",
+    "deploy": "vercel deploy -y"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

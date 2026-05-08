@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>PEIX Allergy Media Index</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <main class="shell">
+      <header class="topbar">
+        <div>
+          <p class="brand">PEIX Healthcare Media</p>
+          <h1>Allergy Media Index</h1>
+        </div>
+        <div class="topbar-actions">
+          <button id="refreshButton" type="button">Refresh</button>
+          <span id="qualityStatus" class="status-dot">Loading</span>
+        </div>
+      </header>
+
+      <section class="summary-grid" aria-label="Snapshot summary">
+        <article class="summary-panel primary">
+          <span class="label">Top region</span>
+          <strong id="topRegion">--</strong>
+          <span id="topRegionAction" class="subtle">--</span>
+        </article>
+        <article class="summary-panel">
+          <span class="label">Boost regions</span>
+          <strong id="boostCount">--</strong>
+          <span class="subtle">budget activation</span>
+        </article>
+        <article class="summary-panel">
+          <span class="label">Avg confidence</span>
+          <strong id="avgConfidence">--</strong>
+          <span class="subtle">source coverage</span>
+        </article>
+        <article class="summary-panel">
+          <span class="label">Target date</span>
+          <strong id="targetDate">--</strong>
+          <span id="generatedAt" class="subtle">--</span>
+        </article>
+      </section>
+
+      <section class="workspace">
+        <section class="ranking-panel" aria-label="Regional ranking">
+          <div class="panel-head">
+            <h2>Regional trigger queue</h2>
+            <span id="regionCount" class="count">--</span>
+          </div>
+          <div id="rankingList" class="ranking-list" aria-live="polite"></div>
+        </section>
+
+        <aside class="detail-panel" aria-label="Region detail">
+          <div class="panel-head">
+            <h2 id="detailRegion">--</h2>
+            <span id="detailAction" class="action-pill">--</span>
+          </div>
+          <div class="score-band">
+            <span id="detailScore">--</span>
+            <div class="score-track">
+              <span id="detailScoreBar"></span>
+            </div>
+          </div>
+
+          <dl class="component-grid">
+            <div>
+              <dt>Pollen</dt>
+              <dd id="componentPollen">--</dd>
+            </div>
+            <div>
+              <dt>Weather</dt>
+              <dd id="componentWeather">--</dd>
+            </div>
+            <div>
+              <dt>Air</dt>
+              <dd id="componentAir">--</dd>
+            </div>
+            <div>
+              <dt>Demand</dt>
+              <dd id="componentDemand">--</dd>
+            </div>
+          </dl>
+
+          <section class="decision-block">
+            <h3>Media move</h3>
+            <p id="budgetShift">--</p>
+            <ul id="channelPlan" class="chip-list"></ul>
+          </section>
+
+          <section class="decision-block">
+            <h3>Signal trace</h3>
+            <ul id="sourceTrace" class="trace-list"></ul>
+          </section>
+        </aside>
+      </section>
+
+      <section class="source-panel" aria-label="Data sources">
+        <div class="panel-head">
+          <h2>Source status</h2>
+          <span id="privacyMode" class="count">contextual only</span>
+        </div>
+        <div id="sourceStatus" class="source-grid"></div>
+      </section>
+    </main>
+
+    <script src="/app.js"></script>
+  </body>
+</html>
