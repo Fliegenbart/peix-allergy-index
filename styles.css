@@ -356,7 +356,9 @@ h3 {
 .ranking-panel,
 .flow-panel,
 .detail-panel,
-.source-panel {
+.source-panel,
+.methodology-panel,
+.validation-panel {
   padding: 18px;
 }
 
@@ -679,7 +681,8 @@ dd {
 }
 
 .source-panel,
-.methodology-panel {
+.methodology-panel,
+.validation-panel {
   margin-top: 16px;
 }
 
@@ -778,6 +781,43 @@ dd {
   z-index: 1;
 }
 
+.validation-grid {
+  display: grid;
+  gap: 10px;
+  grid-template-columns: 1.45fr repeat(5, minmax(0, 1fr));
+  position: relative;
+  z-index: 1;
+}
+
+.validation-card {
+  background: rgba(255, 255, 255, 0.58);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  display: grid;
+  gap: 8px;
+  min-height: 128px;
+  padding: 14px;
+}
+
+.validation-card.primary {
+  background:
+    linear-gradient(135deg, rgba(220, 235, 244, 0.82), rgba(255, 255, 255, 0.7)),
+    rgba(255, 255, 255, 0.72);
+}
+
+.validation-card strong {
+  font-size: clamp(1.35rem, 1.8vw, 2.2rem);
+  font-weight: 760;
+  letter-spacing: -0.04em;
+  line-height: 0.98;
+  overflow-wrap: anywhere;
+}
+
+.validation-card .subtle {
+  line-height: 1.3;
+  text-transform: none;
+}
+
 .empty-state {
   background: rgba(255, 255, 255, 0.56);
   border: 1px dashed var(--line-strong);
@@ -860,7 +900,8 @@ dd {
 
   .summary-grid,
   .source-grid,
-  .weight-grid {
+  .weight-grid,
+  .validation-grid {
     grid-template-columns: 1fr;
   }
 

@@ -59,3 +59,15 @@ Do not automate budget changes until the index beats baseline on:
 Until those gates pass, the dashboard should label the model as:
 
 > Evidence-informed MVP prior. Backtest required before automated media buying.
+
+## Machine Setup
+
+The MVP now stores forecast snapshots before outcomes are known. This creates a clean audit trail:
+
+- `scripts/capture-snapshot.js` collects tomorrow's forecast from DWD, Open-Meteo, and Google Trends RSS.
+- `.github/workflows/capture-allergy-snapshot.yml` runs that capture daily and commits JSON into `data/snapshots`.
+- `data/outcomes/allergy-outcomes.csv` is the place for later truth data from pharmacy, search, media, or sales exports.
+- `scripts/run-backtest.js` joins forecast rows to outcome rows by `date + regionCode`.
+- `/api/validation` exposes the current validation status to the dashboard.
+
+This is intentionally simple. The first goal is not a black-box AI model, but a trustworthy forecast memory that lets PEIX prove whether its trigger logic predicts real demand better than a flat seasonal baseline.

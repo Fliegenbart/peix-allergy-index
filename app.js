@@ -1,5 +1,6 @@
 const state = {
   snapshot: null,
+  validation: null,
   selectedRegionCode: null,
   flow: {
     animationFrame: null,
@@ -36,6 +37,15 @@ const elements = {
   methodologySummary: document.querySelector("#methodologySummary"),
   methodologyVersion: document.querySelector("#methodologyVersion"),
   methodologyWeights: document.querySelector("#methodologyWeights"),
+  validationStatus: document.querySelector("#validationStatus"),
+  validationState: document.querySelector("#validationState"),
+  validationNote: document.querySelector("#validationNote"),
+  validationSnapshotCount: document.querySelector("#validationSnapshotCount"),
+  validationLatest: document.querySelector("#validationLatest"),
+  validationOutcomeRows: document.querySelector("#validationOutcomeRows"),
+  validationCorrelation: document.querySelector("#validationCorrelation"),
+  validationLift: document.querySelector("#validationLift"),
+  validationPrecision: document.querySelector("#validationPrecision"),
   privacyMode: document.querySelector("#privacyMode"),
   flowCanvas: document.querySelector("#flowCanvas"),
   flowRegion: document.querySelector("#flowRegion"),
@@ -58,16 +68,25 @@ loadSnapshot();
 
 async function loadSnapshot() {
   elements.qualityStatus.textContent = "Loading";
+  elements.validationStatus.textContent = "Loading";
   elements.rankingList.innerHTML = '<div class="empty-state">Loading allergy media index...</div>';
 
   try {
-    const response = await fetch(`/api/allergy-index?ts=${Date.now()}`, {
-      cache: "no-store",
-    });
-    if (!response.ok) {
-      throw new Error(`${response.status} ${response.statusText}`);
-    }
-    state.snapshot = await response.json();
+    const ts = Date.now();
+    const [snapshot, validation] = await Promise.all([
+      fetchJson(`/api/allergy-index?ts=${ts}`),
+      fetchJson(`/api/validation?ts=${ts}`).catch((error) => ({
+        status: "unavailable",
+        machineState: "validation_api_unavailable",
+        snapshotCount: 0,
+        outcomeRows: 0,
+        error: error.message,
+        report: {},
+      })),
+    ]);
+
+    state.snapshot = snapshot;
+    state.validation = validation;
     state.selectedRegionCode =
       state.snapshot.rankings[0] && state.snapshot.rankings[0].regionCode;
     render();
@@ -106,8 +125,17 @@ function render() {
   renderDetail(selected);
   renderSources(snapshot.sourceStatus);
   renderMethodology(snapshot.methodology);
+  renderValidation(state.validation);
   renderFlowReadout(selected);
   startFlowAnimation(selected);
+}
+
+async function fetchJson(url) {
+  const response = await fetch(url, { cache: "no-store" });
+  if (!response.ok) {
+    throw new Error(`${response.status} ${response.statusText}`);
+  }
+  return response.json();
 }
 
 function regionRow(row, index) {
@@ -194,6 +222,28 @@ function renderMethodology(methodology) {
       `;
     })
     .join("");
+}
+
+function renderValidation(summary) {
+  if (!summary) return;
+
+  const report = summary.report || {};
+  const note =
+    summary.error ||
+    (Array.isArray(report.notes) && report.notes[0]) ||
+    "Ready to compare forecasts with outcome data.";
+
+  elements.validationStatus.textContent = formatToken(summary.status || "unknown");
+  elements.validationState.textContent = formatToken(summary.machineState || "unknown");
+  elements.validationNote.textContent = note;
+  elements.validationSnapshotCount.textContent = formatMetric(summary.snapshotCount);
+  elements.validationOutcomeRows.textContent = formatMetric(summary.outcomeRows);
+  elements.validationCorrelation.textContent = formatMetric(report.pearsonMediaIndex);
+  elements.validationLift.textContent = formatMetric(report.topIndexLift);
+  elements.validationPrecision.textContent = formatMetric(report.precisionAtK);
+  elements.validationLatest.textContent = summary.latestSnapshot
+    ? `latest target ${summary.latestSnapshot.targetDate}`
+    : "daily memory";
 }
 
 function startFlowAnimation(selected) {
@@ -331,6 +381,12 @@ function formatToken(value) {
 
 function formatEvidence(value) {
   return formatToken(value).replace("support", "evidence");
+}
+
+function formatMetric(value) {
+  if (value === null || value === undefined || value === "") return "--";
+  if (typeof value === "number" && Number.isFinite(value)) return String(value);
+  return String(value);
 }
 
 function escapeHtml(value) {

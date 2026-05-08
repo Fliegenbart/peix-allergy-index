@@ -4,6 +4,10 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>PEIX Allergy Media Index</title>
+    <link
+      rel="icon"
+      href='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" rx="14" fill="%23101814"/><text x="32" y="42" text-anchor="middle" font-family="Arial" font-size="34" font-weight="700" fill="white">P</text></svg>'
+    />
     <link rel="stylesheet" href="/styles.css" />
   </head>
   <body>
@@ -21,6 +25,7 @@
           <span class="active">Overview</span>
           <span>Regions</span>
           <span>Forecasts</span>
+          <span>Validation</span>
           <span>Plan</span>
         </div>
         <div class="chrome-actions">
@@ -172,6 +177,48 @@
         <div class="methodology-footer">
           <span id="methodologyVersion">--</span>
           <span>Backtest before automation</span>
+        </div>
+      </section>
+
+      <section class="validation-panel glass-panel" aria-label="Validation engine">
+        <div class="panel-head">
+          <div>
+            <p class="section-kicker">Validation engine</p>
+            <h2>Forecast memory and backtest status</h2>
+          </div>
+          <span id="validationStatus" class="status-dot">loading</span>
+        </div>
+        <div class="validation-grid">
+          <article class="validation-card primary">
+            <span class="label">Machine state</span>
+            <strong id="validationState">--</strong>
+            <span id="validationNote" class="subtle">--</span>
+          </article>
+          <article class="validation-card">
+            <span class="label">Forecast snapshots</span>
+            <strong id="validationSnapshotCount">--</strong>
+            <span id="validationLatest" class="subtle">daily memory</span>
+          </article>
+          <article class="validation-card">
+            <span class="label">Outcome rows</span>
+            <strong id="validationOutcomeRows">--</strong>
+            <span class="subtle">client truth data</span>
+          </article>
+          <article class="validation-card">
+            <span class="label">Correlation</span>
+            <strong id="validationCorrelation">--</strong>
+            <span class="subtle">index vs outcome</span>
+          </article>
+          <article class="validation-card">
+            <span class="label">Top lift</span>
+            <strong id="validationLift">--</strong>
+            <span class="subtle">top regions vs average</span>
+          </article>
+          <article class="validation-card">
+            <span class="label">Precision</span>
+            <strong id="validationPrecision">--</strong>
+            <span class="subtle">forecast top set hit rate</span>
+          </article>
         </div>
       </section>
     </main>

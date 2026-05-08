@@ -5,6 +5,8 @@
   "description": "PEIX Allergy Media Index MVP for contextual OTC allergy media activation.",
   "scripts": {
     "test": "node --test",
+    "capture": "node scripts/capture-snapshot.js --output-dir data/snapshots",
+    "backtest": "node scripts/run-backtest.js",
     "local": "vercel dev --listen 3000",
     "deploy": "vercel deploy -y"
   },
