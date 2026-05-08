@@ -1,6 +1,12 @@
 const state = {
   snapshot: null,
   selectedRegionCode: null,
+  flow: {
+    animationFrame: null,
+    particles: [],
+    selected: null,
+    started: false,
+  },
 };
 
 const elements = {
@@ -27,10 +33,21 @@ const elements = {
   sourceTrace: document.querySelector("#sourceTrace"),
   sourceStatus: document.querySelector("#sourceStatus"),
   privacyMode: document.querySelector("#privacyMode"),
+  flowCanvas: document.querySelector("#flowCanvas"),
+  flowRegion: document.querySelector("#flowRegion"),
+  flowAction: document.querySelector("#flowAction"),
+  flowScore: document.querySelector("#flowScore"),
+  flowMeta: document.querySelector("#flowMeta"),
 };
+
+const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
 elements.refreshButton.addEventListener("click", () => {
   loadSnapshot();
+});
+
+window.addEventListener("resize", () => {
+  resizeFlowCanvas();
 });
 
 loadSnapshot();
@@ -84,6 +101,8 @@ function render() {
 
   renderDetail(selected);
   renderSources(snapshot.sourceStatus);
+  renderFlowReadout(selected);
+  startFlowAnimation(selected);
 }
 
 function regionRow(row, index) {
@@ -92,7 +111,7 @@ function regionRow(row, index) {
     <button class="region-row${isActive}" data-region="${row.regionCode}" type="button">
       <span class="region-main">
         <span class="region-name">${index + 1}. ${escapeHtml(row.regionName)}</span>
-        <span class="subtle">${escapeHtml(row.regionCode)} · ${escapeHtml(
+        <span class="subtle">${escapeHtml(row.regionCode)} / ${escapeHtml(
           row.topPollen ? row.topPollen.type : "no pollen"
         )}</span>
       </span>
@@ -117,8 +136,21 @@ function renderDetail(row) {
   elements.componentAir.textContent = row.componentScores.airQuality;
   elements.componentDemand.textContent = row.componentScores.demand;
   elements.budgetShift.textContent = `${signed(row.suggestedBudgetShiftPct)}% budget shift`;
-  elements.channelPlan.innerHTML = row.channelPlan.map((item) => `<li>${escapeHtml(item)}</li>`).join("");
-  elements.sourceTrace.innerHTML = row.sourceTrace.map((item) => `<li>${escapeHtml(item)}</li>`).join("");
+  elements.channelPlan.innerHTML = row.channelPlan
+    .map((item) => `<li>${escapeHtml(formatToken(item))}</li>`)
+    .join("");
+  elements.sourceTrace.innerHTML = row.sourceTrace
+    .map((item) => `<li>${escapeHtml(formatToken(item))}</li>`)
+    .join("");
+}
+
+function renderFlowReadout(row) {
+  if (!row) return;
+  elements.flowRegion.textContent = `${row.regionName} / ${row.regionCode}`;
+  elements.flowAction.textContent = row.action;
+  elements.flowAction.className = `action-pill action ${row.action}`;
+  elements.flowScore.textContent = row.mediaIndex;
+  elements.flowMeta.textContent = `Pollen ${row.componentScores.pollen} / Demand ${row.componentScores.demand}`;
 }
 
 function renderSources(sources) {
@@ -126,13 +158,132 @@ function renderSources(sources) {
     .map(
       (source) => `
         <article class="source-card">
-          <strong>${escapeHtml(source.source)}</strong>
+          <strong>${escapeHtml(formatToken(source.source))}</strong>
           <span>${escapeHtml(source.status)}</span>
-          <span>${escapeHtml(source.message || source.updatedAt || `${source.regionCount || ""} regions`)}</span>
+          <span>${escapeHtml(
+            source.message || source.updatedAt || `${source.regionCount || ""} regions`
+          )}</span>
         </article>
       `
     )
     .join("");
+}
+
+function startFlowAnimation(selected) {
+  state.flow.selected = selected;
+  resizeFlowCanvas();
+  if (!state.flow.particles.length) {
+    state.flow.particles = createParticles(86);
+  }
+  if (state.flow.started && !reducedMotion) {
+    return;
+  }
+  state.flow.started = true;
+  drawFlow();
+}
+
+function resizeFlowCanvas() {
+  const canvas = elements.flowCanvas;
+  if (!canvas) return;
+  const rect = canvas.getBoundingClientRect();
+  const ratio = Math.min(window.devicePixelRatio || 1, 2);
+  const width = Math.max(1, Math.floor(rect.width * ratio));
+  const height = Math.max(1, Math.floor(rect.height * ratio));
+  if (canvas.width !== width || canvas.height !== height) {
+    canvas.width = width;
+    canvas.height = height;
+  }
+}
+
+function createParticles(count) {
+  return Array.from({ length: count }, (_, index) => ({
+    x: Math.random(),
+    y: Math.random(),
+    speed: 0.00045 + Math.random() * 0.0011,
+    phase: Math.random() * Math.PI * 2,
+    size: 0.8 + Math.random() * 2.4,
+    lane: index % 5,
+  }));
+}
+
+function drawFlow() {
+  const canvas = elements.flowCanvas;
+  const context = canvas && canvas.getContext("2d");
+  if (!canvas || !context) return;
+
+  const width = canvas.width;
+  const height = canvas.height;
+  const selected = state.flow.selected;
+  const intensity = selected ? selected.mediaIndex / 100 : 0.5;
+  const pollen = selected ? selected.componentScores.pollen / 100 : 0.5;
+  const demand = selected ? selected.componentScores.demand / 100 : 0.5;
+  const time = performance.now() * 0.001;
+
+  context.clearRect(0, 0, width, height);
+  drawContourLines(context, width, height, time, intensity, pollen);
+  drawParticles(context, width, height, time, intensity, demand);
+
+  if (!reducedMotion) {
+    state.flow.animationFrame = requestAnimationFrame(drawFlow);
+  }
+}
+
+function drawContourLines(context, width, height, time, intensity, pollen) {
+  const lineCount = 9;
+  for (let line = 0; line < lineCount; line += 1) {
+    const yBase = height * (0.18 + line * 0.075);
+    const amplitude = height * (0.04 + pollen * 0.045);
+    const alpha = 0.12 + intensity * 0.12 - line * 0.006;
+    context.beginPath();
+    for (let step = 0; step <= 120; step += 1) {
+      const x = (step / 120) * width;
+      const wave =
+        Math.sin(step * 0.085 + time * (0.45 + line * 0.035) + line) * amplitude +
+        Math.cos(step * 0.045 + time * 0.3) * amplitude * 0.34;
+      const y = yBase + wave + Math.sin(line + time * 0.18) * height * 0.03;
+      if (step === 0) {
+        context.moveTo(x, y);
+      } else {
+        context.lineTo(x, y);
+      }
+    }
+    context.strokeStyle = `rgba(23, 107, 77, ${Math.max(0.035, alpha)})`;
+    context.lineWidth = 1.2 + intensity * 1.6;
+    context.stroke();
+  }
+
+  const gradient = context.createLinearGradient(0, height * 0.25, width, height * 0.72);
+  gradient.addColorStop(0, "rgba(23, 107, 77, 0)");
+  gradient.addColorStop(0.48, `rgba(47, 111, 159, ${0.08 + intensity * 0.08})`);
+  gradient.addColorStop(1, "rgba(23, 107, 77, 0)");
+  context.fillStyle = gradient;
+  context.beginPath();
+  context.ellipse(width * 0.52, height * 0.52, width * 0.42, height * 0.16, -0.18, 0, Math.PI * 2);
+  context.fill();
+}
+
+function drawParticles(context, width, height, time, intensity, demand) {
+  const colorA = [23, 107, 77];
+  const colorB = [47, 111, 159];
+  for (const particle of state.flow.particles) {
+    particle.x += particle.speed * (0.5 + intensity);
+    if (particle.x > 1.05) {
+      particle.x = -0.04;
+      particle.y = Math.random();
+    }
+    const curve =
+      Math.sin(particle.x * Math.PI * 2 + particle.phase + time * 0.55) * 0.08 +
+      Math.cos(time * 0.3 + particle.lane) * 0.018;
+    const x = particle.x * width;
+    const y = (0.18 + particle.y * 0.66 + curve) * height;
+    const mix = particle.lane / 4;
+    const rgb = colorA.map((value, index) => Math.round(value * (1 - mix) + colorB[index] * mix));
+    const alpha = 0.18 + demand * 0.18;
+    context.beginPath();
+    context.fillStyle = `rgba(${rgb[0]}, ${rgb[1]}, ${rgb[2]}, ${alpha})`;
+    context.arc(x, y, particle.size * (window.devicePixelRatio || 1), 0, Math.PI * 2);
+    context.fill();
+  }
 }
 
 function shortDateTime(value) {
@@ -145,6 +296,10 @@ function shortDateTime(value) {
 
 function signed(value) {
   return value > 0 ? `+${value}` : String(value);
+}
+
+function formatToken(value) {
+  return String(value || "").replaceAll("_", " ").toLowerCase();
 }
 
 function escapeHtml(value) {

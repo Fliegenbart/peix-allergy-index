@@ -7,55 +7,106 @@
     <link rel="stylesheet" href="/styles.css" />
   </head>
   <body>
-    <main class="shell">
-      <header class="topbar">
-        <div>
-          <p class="brand">PEIX Healthcare Media</p>
-          <h1>Allergy Media Index</h1>
+    <div class="ambient-plane" aria-hidden="true"></div>
+    <main class="dashboard-shell">
+      <nav class="app-chrome" aria-label="Dashboard navigation">
+        <a class="brand-lockup" href="/">
+          <span class="brand-mark">P</span>
+          <span>
+            <span class="brand">PEIX Healthcare Media</span>
+            <span class="brand-subline">Contextual allergy activation</span>
+          </span>
+        </a>
+        <div class="nav-tabs" aria-label="Dashboard sections">
+          <span class="active">Overview</span>
+          <span>Regions</span>
+          <span>Forecasts</span>
+          <span>Plan</span>
         </div>
-        <div class="topbar-actions">
-          <button id="refreshButton" type="button">Refresh</button>
+        <div class="chrome-actions">
           <span id="qualityStatus" class="status-dot">Loading</span>
+          <button id="refreshButton" class="refresh-button" type="button">
+            <span>Refresh</span>
+          </button>
         </div>
+      </nav>
+
+      <header class="hero-strip">
+        <section class="hero-copy" aria-label="Dashboard introduction">
+          <p class="eyeline">Live media intelligence</p>
+          <h1>Allergy Media Index</h1>
+          <p class="hero-text">
+            Environmental demand signals for OTC allergy budget moves.
+          </p>
+        </section>
+
+        <section class="summary-grid" aria-label="Snapshot summary">
+          <article class="summary-panel primary">
+            <span class="label">Top region</span>
+            <strong id="topRegion">--</strong>
+            <span id="topRegionAction" class="subtle">--</span>
+          </article>
+          <article class="summary-panel">
+            <span class="label">Boost regions</span>
+            <strong id="boostCount">--</strong>
+            <span class="subtle">budget activation</span>
+          </article>
+          <article class="summary-panel">
+            <span class="label">Avg confidence</span>
+            <strong id="avgConfidence">--</strong>
+            <span class="subtle">source coverage</span>
+          </article>
+          <article class="summary-panel">
+            <span class="label">Target date</span>
+            <strong id="targetDate">--</strong>
+            <span id="generatedAt" class="subtle">--</span>
+          </article>
+        </section>
       </header>
 
-      <section class="summary-grid" aria-label="Snapshot summary">
-        <article class="summary-panel primary">
-          <span class="label">Top region</span>
-          <strong id="topRegion">--</strong>
-          <span id="topRegionAction" class="subtle">--</span>
-        </article>
-        <article class="summary-panel">
-          <span class="label">Boost regions</span>
-          <strong id="boostCount">--</strong>
-          <span class="subtle">budget activation</span>
-        </article>
-        <article class="summary-panel">
-          <span class="label">Avg confidence</span>
-          <strong id="avgConfidence">--</strong>
-          <span class="subtle">source coverage</span>
-        </article>
-        <article class="summary-panel">
-          <span class="label">Target date</span>
-          <strong id="targetDate">--</strong>
-          <span id="generatedAt" class="subtle">--</span>
-        </article>
-      </section>
-
-      <section class="workspace">
-        <section class="ranking-panel" aria-label="Regional ranking">
+      <section class="command-grid">
+        <section class="ranking-panel glass-panel" aria-label="Regional ranking">
           <div class="panel-head">
-            <h2>Regional trigger queue</h2>
+            <div>
+              <p class="section-kicker">Queue</p>
+              <h2>Regional trigger queue</h2>
+            </div>
             <span id="regionCount" class="count">--</span>
           </div>
           <div id="rankingList" class="ranking-list" aria-live="polite"></div>
         </section>
 
-        <aside class="detail-panel" aria-label="Region detail">
+        <section class="flow-panel glass-panel" aria-label="Allergy signal flow">
           <div class="panel-head">
-            <h2 id="detailRegion">--</h2>
+            <div>
+              <p class="section-kicker">Flow field</p>
+              <h2>Atmospheric signal layer</h2>
+            </div>
+            <span id="flowAction" class="action-pill">--</span>
+          </div>
+          <div class="flow-stage">
+            <canvas id="flowCanvas" aria-hidden="true"></canvas>
+            <div class="flow-readout">
+              <span id="flowRegion">--</span>
+              <strong id="flowScore">--</strong>
+              <span id="flowMeta">Pollen -- / Demand --</span>
+            </div>
+          </div>
+          <div class="flow-footer">
+            <span>Contextual only</span>
+            <span id="privacyMode">no individual health targeting</span>
+          </div>
+        </section>
+
+        <aside class="detail-panel glass-panel" aria-label="Region detail">
+          <div class="panel-head">
+            <div>
+              <p class="section-kicker">Inspector</p>
+              <h2 id="detailRegion">--</h2>
+            </div>
             <span id="detailAction" class="action-pill">--</span>
           </div>
+
           <div class="score-band">
             <span id="detailScore">--</span>
             <div class="score-track">
@@ -95,10 +146,13 @@
         </aside>
       </section>
 
-      <section class="source-panel" aria-label="Data sources">
+      <section class="source-panel glass-panel" aria-label="Data sources">
         <div class="panel-head">
-          <h2>Source status</h2>
-          <span id="privacyMode" class="count">contextual only</span>
+          <div>
+            <p class="section-kicker">Sources</p>
+            <h2>Live data status</h2>
+          </div>
+          <span class="count">DWD / Open-Meteo / Google</span>
         </div>
         <div id="sourceStatus" class="source-grid"></div>
       </section>
