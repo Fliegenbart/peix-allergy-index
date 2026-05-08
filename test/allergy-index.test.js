@@ -3,8 +3,12 @@ const assert = require("node:assert/strict");
 
 const {
   buildSnapshot,
+  buildGoogleDemandSignals,
+  parseApproxTraffic,
   parseDwdIndex,
   parseDwdPollen,
+  parseGoogleTrendsRss,
+  scoreGoogleDemand,
   scoreWeather,
 } = require("../lib/allergy-index");
 
@@ -135,4 +139,65 @@ test("scoreWeather recognises low-rain dry pollen weather", () => {
 
   assert.equal(result.rainBrake, false);
   assert.equal(result.score >= 90, true);
+});
+
+test("parseGoogleTrendsRss extracts Google trending topics and traffic", () => {
+  const items = parseGoogleTrendsRss(`
+    <rss xmlns:ht="https://trends.google.com/trending/rss">
+      <channel>
+        <item>
+          <title>Pollenflug heute</title>
+          <ht:approx_traffic>2K+</ht:approx_traffic>
+          <pubDate>Fri, 8 May 2026 04:30:00 -0700</pubDate>
+          <ht:news_item>
+            <ht:news_item_title>Heuschnupfen-Saison startet</ht:news_item_title>
+          </ht:news_item>
+        </item>
+      </channel>
+    </rss>
+  `);
+
+  assert.equal(items.length, 1);
+  assert.equal(items[0].title, "Pollenflug heute");
+  assert.equal(items[0].approxTraffic, 2000);
+  assert.equal(items[0].newsTitles[0], "Heuschnupfen-Saison startet");
+});
+
+test("scoreGoogleDemand raises demand when allergy terms trend on Google", () => {
+  const demand = scoreGoogleDemand([
+    {
+      title: "Pollenflug heute",
+      approxTraffic: 2000,
+      newsTitles: ["Heuschnupfen-Saison startet"],
+    },
+    {
+      title: "Champions League",
+      approxTraffic: 10000,
+      newsTitles: [],
+    },
+  ]);
+
+  assert.equal(demand.score > 50, true);
+  assert.deepEqual(demand.matchedTopics, ["Pollenflug heute"]);
+  assert.equal(demand.source, "GOOGLE_TRENDS_RSS");
+});
+
+test("buildGoogleDemandSignals creates regional demand rows from one Google signal", () => {
+  const rows = buildGoogleDemandSignals("2026-05-09", {
+    score: 68,
+    delta: 18,
+    source: "GOOGLE_TRENDS_RSS",
+    matchedTopics: ["Pollenflug heute"],
+  });
+
+  assert.equal(rows.length >= 16, true);
+  assert.equal(rows[0].targetDate, "2026-05-09");
+  assert.equal(rows[0].searchInterest, 68);
+  assert.equal(rows[0].source, "GOOGLE_TRENDS_RSS");
+});
+
+test("parseApproxTraffic handles Google traffic suffixes", () => {
+  assert.equal(parseApproxTraffic("200+"), 200);
+  assert.equal(parseApproxTraffic("2K+"), 2000);
+  assert.equal(parseApproxTraffic("1.5M+"), 1500000);
 });

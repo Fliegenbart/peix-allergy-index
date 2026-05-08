@@ -2,14 +2,18 @@ const {
   REGIONS,
   airQualityFromOpenMeteo,
   buildDemoSignals,
+  buildGoogleDemandSignals,
   buildNeutralDemand,
   buildSnapshot,
   parseDwdPollen,
+  parseGoogleTrendsRss,
+  scoreGoogleDemand,
   weatherFromOpenMeteo,
 } = require("../lib/allergy-index");
 
 const DWD_POLLEN_URL =
   "https://opendata.dwd.de/climate_environment/health/alerts/s31fg.json";
+const GOOGLE_TRENDS_RSS_URL = "https://trends.google.com/trending/rss?geo=DE";
 
 module.exports = async function handler(request, response) {
   const targetDate = resolveTargetDate(request.query && request.query.date);
@@ -62,11 +66,26 @@ module.exports = async function handler(request, response) {
     regionCount: airQuality.length,
   });
 
-  sourceStatus.push({
-    source: "DEMAND_PROXY",
-    status: "neutral",
-    message: "Public regional Google Trends is not connected in this MVP.",
-  });
+  try {
+    const googleTrendsXml = await fetchText(GOOGLE_TRENDS_RSS_URL, 4000);
+    const googleDemand = scoreGoogleDemand(parseGoogleTrendsRss(googleTrendsXml));
+    demand = buildGoogleDemandSignals(targetDate, googleDemand);
+    sourceStatus.push({
+      source: "GOOGLE_TRENDS_RSS",
+      status: "live",
+      score: googleDemand.score,
+      matchedTopicCount: googleDemand.matchedItemCount,
+      message: googleDemand.matchedTopics.length
+        ? `Matched: ${googleDemand.matchedTopics.join(", ")}`
+        : "No allergy term is trending nationally right now.",
+    });
+  } catch (error) {
+    sourceStatus.push({
+      source: "GOOGLE_TRENDS_RSS",
+      status: "fallback",
+      message: error.message,
+    });
+  }
 
   if (!pollen.length && !weather.length && !airQuality.length) {
     const demo = buildDemoSignals(targetDate);
@@ -125,6 +144,11 @@ async function fetchAirQuality(region, targetDate) {
 }
 
 async function fetchJson(url, timeoutMs) {
+  const text = await fetchText(url, timeoutMs);
+  return JSON.parse(text);
+}
+
+async function fetchText(url, timeoutMs) {
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), timeoutMs);
   try {
@@ -132,7 +156,7 @@ async function fetchJson(url, timeoutMs) {
     if (!result.ok) {
       throw new Error(`${result.status} ${result.statusText}`);
     }
-    return await result.json();
+    return await result.text();
   } finally {
     clearTimeout(timeout);
   }

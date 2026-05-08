@@ -40,7 +40,9 @@ async function loadSnapshot() {
   elements.rankingList.innerHTML = '<div class="empty-state">Loading allergy media index...</div>';
 
   try {
-    const response = await fetch("/api/allergy-index");
+    const response = await fetch(`/api/allergy-index?ts=${Date.now()}`, {
+      cache: "no-store",
+    });
     if (!response.ok) {
       throw new Error(`${response.status} ${response.statusText}`);
     }
