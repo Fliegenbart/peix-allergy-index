@@ -14,7 +14,10 @@ test("buildLiveSnapshot builds a full regional snapshot from public-source paylo
   assert.equal(snapshot.rankings.length, 16);
   assert.equal(snapshot.sourceStatus.some((source) => source.source === "DWD_POLLEN"), true);
   assert.equal(
-    snapshot.sourceStatus.some((source) => source.source === "GOOGLE_TRENDS_RSS"),
+    snapshot.sourceStatus.some(
+      (source) =>
+        source.source === "GOOGLE_TRENDS_REGIONAL" || source.source === "GOOGLE_TRENDS_RSS"
+    ),
     true
   );
   assert.equal(snapshot.methodology.version, "mvp_prior_v1");
@@ -65,12 +68,14 @@ function fakeResponse(url) {
     });
   }
   if (value.includes("trends.google.com")) {
+    const isNW = value.includes("geo=DE-NW");
+    const trafficLevel = isNW ? "5K+" : "2K+";
     return textResponse(`
       <rss xmlns:ht="https://trends.google.com/trending/rss">
         <channel>
           <item>
             <title>Pollenflug heute</title>
-            <ht:approx_traffic>2K+</ht:approx_traffic>
+            <ht:approx_traffic>${trafficLevel}</ht:approx_traffic>
           </item>
         </channel>
       </rss>
