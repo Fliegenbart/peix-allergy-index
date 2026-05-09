@@ -306,60 +306,70 @@ function drawFlow() {
 }
 
 function drawContourLines(context, width, height, time, intensity, pollen) {
-  const lineCount = 9;
+  const lineCount = 12;
   for (let line = 0; line < lineCount; line += 1) {
-    const yBase = height * (0.18 + line * 0.075);
-    const amplitude = height * (0.04 + pollen * 0.045);
-    const alpha = 0.12 + intensity * 0.12 - line * 0.006;
+    const yBase = height * (0.12 + line * 0.065);
+    const amplitude = height * (0.035 + pollen * 0.05);
+    const alpha = 0.15 + intensity * 0.2 - line * 0.008;
     context.beginPath();
-    for (let step = 0; step <= 120; step += 1) {
-      const x = (step / 120) * width;
+    for (let step = 0; step <= 150; step += 1) {
+      const x = (step / 150) * width;
       const wave =
-        Math.sin(step * 0.085 + time * (0.45 + line * 0.035) + line) * amplitude +
-        Math.cos(step * 0.045 + time * 0.3) * amplitude * 0.34;
-      const y = yBase + wave + Math.sin(line + time * 0.18) * height * 0.03;
+        Math.sin(step * 0.075 + time * (0.5 + line * 0.04) + line) * amplitude +
+        Math.cos(step * 0.04 + time * 0.35) * amplitude * 0.4;
+      const y = yBase + wave + Math.sin(line + time * 0.2) * height * 0.025;
       if (step === 0) {
         context.moveTo(x, y);
       } else {
         context.lineTo(x, y);
       }
     }
-    context.strokeStyle = `rgba(23, 107, 77, ${Math.max(0.035, alpha)})`;
-    context.lineWidth = 1.2 + intensity * 1.6;
+    const hue = 160 + line * 3;
+    context.strokeStyle = `hsla(${hue}, 100%, 60%, ${Math.max(0.04, alpha)})`;
+    context.lineWidth = 1 + intensity * 1.8;
+    context.shadowColor = `hsla(${hue}, 100%, 50%, 0.5)`;
+    context.shadowBlur = 8 + intensity * 12;
     context.stroke();
+    context.shadowBlur = 0;
   }
 
-  const gradient = context.createLinearGradient(0, height * 0.25, width, height * 0.72);
-  gradient.addColorStop(0, "rgba(23, 107, 77, 0)");
-  gradient.addColorStop(0.48, `rgba(47, 111, 159, ${0.08 + intensity * 0.08})`);
-  gradient.addColorStop(1, "rgba(23, 107, 77, 0)");
+  const gradient = context.createRadialGradient(
+    width * 0.5, height * 0.4, 0,
+    width * 0.5, height * 0.4, width * 0.5
+  );
+  gradient.addColorStop(0, `rgba(0, 255, 136, ${0.06 + intensity * 0.08})`);
+  gradient.addColorStop(0.5, `rgba(0, 212, 255, ${0.03 + intensity * 0.04})`);
+  gradient.addColorStop(1, "rgba(0, 0, 0, 0)");
   context.fillStyle = gradient;
-  context.beginPath();
-  context.ellipse(width * 0.52, height * 0.52, width * 0.42, height * 0.16, -0.18, 0, Math.PI * 2);
-  context.fill();
+  context.fillRect(0, 0, width, height);
 }
 
 function drawParticles(context, width, height, time, intensity, demand) {
-  const colorA = [23, 107, 77];
-  const colorB = [47, 111, 159];
+  const colorA = [0, 255, 136];
+  const colorB = [0, 212, 255];
   for (const particle of state.flow.particles) {
-    particle.x += particle.speed * (0.5 + intensity);
+    particle.x += particle.speed * (0.6 + intensity * 0.8);
     if (particle.x > 1.05) {
       particle.x = -0.04;
       particle.y = Math.random();
     }
     const curve =
-      Math.sin(particle.x * Math.PI * 2 + particle.phase + time * 0.55) * 0.08 +
-      Math.cos(time * 0.3 + particle.lane) * 0.018;
+      Math.sin(particle.x * Math.PI * 2 + particle.phase + time * 0.6) * 0.1 +
+      Math.cos(time * 0.35 + particle.lane) * 0.02;
     const x = particle.x * width;
-    const y = (0.18 + particle.y * 0.66 + curve) * height;
+    const y = (0.15 + particle.y * 0.7 + curve) * height;
     const mix = particle.lane / 4;
     const rgb = colorA.map((value, index) => Math.round(value * (1 - mix) + colorB[index] * mix));
-    const alpha = 0.18 + demand * 0.18;
+    const alpha = 0.25 + demand * 0.35;
+    const size = particle.size * (window.devicePixelRatio || 1) * (0.8 + intensity * 0.4);
+
     context.beginPath();
     context.fillStyle = `rgba(${rgb[0]}, ${rgb[1]}, ${rgb[2]}, ${alpha})`;
-    context.arc(x, y, particle.size * (window.devicePixelRatio || 1), 0, Math.PI * 2);
+    context.shadowColor = `rgba(${rgb[0]}, ${rgb[1]}, ${rgb[2]}, 0.6)`;
+    context.shadowBlur = 6 + intensity * 8;
+    context.arc(x, y, size, 0, Math.PI * 2);
     context.fill();
+    context.shadowBlur = 0;
   }
 }
 
