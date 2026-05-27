@@ -1,0 +1,827 @@
+{
+  "schemaVersion": "peix_allergy_snapshot_v1",
+  "capturedAt": "2026-05-27T07:44:49.191Z",
+  "targetDate": "2026-05-28",
+  "regionCount": 16,
+  "snapshot": {
+    "generatedAt": "2026-05-27T07:44:49.191Z",
+    "targetDate": "2026-05-28",
+    "product": "PEIX Allergy Media Index",
+    "scope": "contextual_environmental_region_targeting",
+    "privacyMode": "no_individual_health_targeting",
+    "methodology": {
+      "version": "mvp_prior_v1",
+      "validationStatus": "heuristic_not_yet_backtested",
+      "summary": "Current weights are transparent MVP priors. Signal choice is evidence-informed, but the exact weights must be learned against outcome data before automated media buying.",
+      "backtestRequiredBeforeAutomation": true,
+      "components": {
+        "pollen": {
+          "label": "Pollen pressure",
+          "weight": 0.45,
+          "weightPct": 45,
+          "evidenceLevel": "direct_domain_signal",
+          "calibrationStatus": "mvp_prior",
+          "rationale": "DWD pollen hazard and allergy literature treat pollen exposure as the primary allergy pressure signal."
+        },
+        "weather": {
+          "label": "Weather exposure modifier",
+          "weight": 0.25,
+          "weightPct": 25,
+          "evidenceLevel": "strong_mechanistic_support",
+          "calibrationStatus": "mvp_prior",
+          "rationale": "Rain, wind, humidity, and temperature modulate airborne pollen exposure and symptom-triggering conditions."
+        },
+        "airQuality": {
+          "label": "Air-quality irritation multiplier",
+          "weight": 0.15,
+          "weightPct": 15,
+          "evidenceLevel": "mechanistic_support",
+          "calibrationStatus": "mvp_prior",
+          "rationale": "PM, ozone, and NO2 can aggravate airway irritation and may increase allergenic potency or symptom burden."
+        },
+        "demand": {
+          "label": "Observed demand confirmation",
+          "weight": 0.1,
+          "weightPct": 10,
+          "evidenceLevel": "digital_proxy_support",
+          "calibrationStatus": "mvp_prior",
+          "rationale": "Google search signals can proxy allergy demand, but this MVP uses national RSS trends until richer regional Google data is connected."
+        },
+        "confidence": {
+          "label": "Source confidence",
+          "weight": 0.05,
+          "weightPct": 5,
+          "evidenceLevel": "operational_quality_control",
+          "calibrationStatus": "mvp_prior",
+          "rationale": "Completeness across independent public signals reduces the risk of activating media from a single noisy source."
+        }
+      },
+      "calibrationTargets": [
+        "google_search_interest",
+        "paid_search_ctr",
+        "pharmacy_sellout",
+        "campaign_conversion_rate",
+        "incremental_roas"
+      ],
+      "calibrationRoadmap": [
+        "Build a daily region panel with pollen, weather, air quality, Google demand, media spend, and outcome data.",
+        "Fit transparent baseline models such as ridge regression, GAM, and hierarchical regional models.",
+        "Backtest ranking quality, lift, lead time, and budget-allocation regret against naive seasonal baselines.",
+        "Promote learned weights only when they improve out-of-sample outcomes and remain explainable for pharma clients."
+      ]
+    },
+    "sourceStatus": [
+      {
+        "source": "DWD_POLLEN",
+        "status": "live",
+        "updatedAt": "2026-05-26 11:00 Uhr",
+        "nextUpdate": "2026-05-27 11:00 Uhr"
+      },
+      {
+        "source": "OPEN_METEO_WEATHER",
+        "status": "live",
+        "regionCount": 16
+      },
+      {
+        "source": "OPEN_METEO_AIR_QUALITY",
+        "status": "live",
+        "regionCount": 16
+      },
+      {
+        "source": "GOOGLE_TRENDS_REGIONAL",
+        "status": "live",
+        "regionCount": 16,
+        "fallbackCount": 0,
+        "message": "Regional trends for 16/16 states"
+      }
+    ],
+    "qualityGate": {
+      "status": "pilot_ready",
+      "averageConfidence": 95,
+      "boostRegionCount": 2,
+      "activationRegionCount": 14,
+      "liveSourceCount": 4,
+      "regionCount": 16
+    },
+    "rankings": [
+      {
+        "regionCode": "BY",
+        "regionName": "Bayern",
+        "targetDate": "2026-05-28",
+        "mediaIndex": 80.1,
+        "action": "boost",
+        "suggestedBudgetShiftPct": 150,
+        "confidence": 95,
+        "rainBrake": false,
+        "blockers": [],
+        "warnings": [],
+        "sourceTrace": [
+          "DWD_POLLEN",
+          "OPEN_METEO_WEATHER",
+          "OPEN_METEO_AIR_QUALITY",
+          "GOOGLE_TRENDS_REGIONAL"
+        ],
+        "topPollen": {
+          "type": "Graeser",
+          "index03": 3,
+          "dwdRegion": "Bayern"
+        },
+        "componentScores": {
+          "pollen": 100,
+          "weather": 95,
+          "airQuality": 10.8,
+          "demand": 50
+        },
+        "drivers": [
+          "high_pollen_pressure",
+          "comfortable_temperature",
+          "wind_spreads_pollen"
+        ],
+        "channelPlan": [
+          "mobile_display",
+          "paid_social",
+          "retail_media",
+          "pharmacy_dooh"
+        ],
+        "compliance": {
+          "targetingMode": "contextual_environmental_region",
+          "personalHealthDataUsed": false,
+          "individualHealthProfileUsed": false,
+          "humanApprovalRequired": true
+        }
+      },
+      {
+        "regionCode": "HH",
+        "regionName": "Hamburg",
+        "targetDate": "2026-05-28",
+        "mediaIndex": 80,
+        "action": "boost",
+        "suggestedBudgetShiftPct": 150,
+        "confidence": 95,
+        "rainBrake": false,
+        "blockers": [],
+        "warnings": [],
+        "sourceTrace": [
+          "DWD_POLLEN",
+          "OPEN_METEO_WEATHER",
+          "OPEN_METEO_AIR_QUALITY",
+          "GOOGLE_TRENDS_REGIONAL"
+        ],
+        "topPollen": {
+          "type": "Graeser",
+          "index03": 3,
+          "dwdRegion": "Schleswig-Holstein und Hamburg"
+        },
+        "componentScores": {
+          "pollen": 100,
+          "weather": 95,
+          "airQuality": 9.7,
+          "demand": 50
+        },
+        "drivers": [
+          "high_pollen_pressure",
+          "comfortable_temperature",
+          "wind_spreads_pollen"
+        ],
+        "channelPlan": [
+          "mobile_display",
+          "paid_social",
+          "retail_media",
+          "pharmacy_dooh"
+        ],
+        "compliance": {
+          "targetingMode": "contextual_environmental_region",
+          "personalHealthDataUsed": false,
+          "individualHealthProfileUsed": false,
+          "humanApprovalRequired": true
+        }
+      },
+      {
+        "regionCode": "BE",
+        "regionName": "Berlin",
+        "targetDate": "2026-05-28",
+        "mediaIndex": 79.8,
+        "action": "prepare",
+        "suggestedBudgetShiftPct": 60,
+        "confidence": 95,
+        "rainBrake": false,
+        "blockers": [],
+        "warnings": [],
+        "sourceTrace": [
+          "DWD_POLLEN",
+          "OPEN_METEO_WEATHER",
+          "OPEN_METEO_AIR_QUALITY",
+          "GOOGLE_TRENDS_REGIONAL"
+        ],
+        "topPollen": {
+          "type": "Graeser",
+          "index03": 3,
+          "dwdRegion": "Brandenburg und Berlin"
+        },
+        "componentScores": {
+          "pollen": 100,
+          "weather": 95,
+          "airQuality": 8.4,
+          "demand": 50
+        },
+        "drivers": [
+          "high_pollen_pressure",
+          "comfortable_temperature",
+          "wind_spreads_pollen"
+        ],
+        "channelPlan": [
+          "programmatic_reserve",
+          "search_budget_ready",
+          "pharmacy_inventory_ping"
+        ],
+        "compliance": {
+          "targetingMode": "contextual_environmental_region",
+          "personalHealthDataUsed": false,
+          "individualHealthProfileUsed": false,
+          "humanApprovalRequired": true
+        }
+      },
+      {
+        "regionCode": "ST",
+        "regionName": "Sachsen-Anhalt",
+        "targetDate": "2026-05-28",
+        "mediaIndex": 79.8,
+        "action": "prepare",
+        "suggestedBudgetShiftPct": 60,
+        "confidence": 95,
+        "rainBrake": false,
+        "blockers": [],
+        "warnings": [],
+        "sourceTrace": [
+          "DWD_POLLEN",
+          "OPEN_METEO_WEATHER",
+          "OPEN_METEO_AIR_QUALITY",
+          "GOOGLE_TRENDS_REGIONAL"
+        ],
+        "topPollen": {
+          "type": "Graeser",
+          "index03": 3,
+          "dwdRegion": "Sachsen-Anhalt"
+        },
+        "componentScores": {
+          "pollen": 100,
+          "weather": 95,
+          "airQuality": 8.4,
+          "demand": 50
+        },
+        "drivers": [
+          "high_pollen_pressure",
+          "comfortable_temperature",
+          "wind_spreads_pollen"
+        ],
+        "channelPlan": [
+          "programmatic_reserve",
+          "search_budget_ready",
+          "pharmacy_inventory_ping"
+        ],
+        "compliance": {
+          "targetingMode": "contextual_environmental_region",
+          "personalHealthDataUsed": false,
+          "individualHealthProfileUsed": false,
+          "humanApprovalRequired": true
+        }
+      },
+      {
+        "regionCode": "SH",
+        "regionName": "Schleswig-Holstein",
+        "targetDate": "2026-05-28",
+        "mediaIndex": 79.8,
+        "action": "prepare",
+        "suggestedBudgetShiftPct": 60,
+        "confidence": 95,
+        "rainBrake": false,
+        "blockers": [],
+        "warnings": [],
+        "sourceTrace": [
+          "DWD_POLLEN",
+          "OPEN_METEO_WEATHER",
+          "OPEN_METEO_AIR_QUALITY",
+          "GOOGLE_TRENDS_REGIONAL"
+        ],
+        "topPollen": {
+          "type": "Graeser",
+          "index03": 3,
+          "dwdRegion": "Schleswig-Holstein und Hamburg"
+        },
+        "componentScores": {
+          "pollen": 100,
+          "weather": 95,
+          "airQuality": 8.4,
+          "demand": 50
+        },
+        "drivers": [
+          "high_pollen_pressure",
+          "comfortable_temperature",
+          "wind_spreads_pollen"
+        ],
+        "channelPlan": [
+          "programmatic_reserve",
+          "search_budget_ready",
+          "pharmacy_inventory_ping"
+        ],
+        "compliance": {
+          "targetingMode": "contextual_environmental_region",
+          "personalHealthDataUsed": false,
+          "individualHealthProfileUsed": false,
+          "humanApprovalRequired": true
+        }
+      },
+      {
+        "regionCode": "BB",
+        "regionName": "Brandenburg",
+        "targetDate": "2026-05-28",
+        "mediaIndex": 79.7,
+        "action": "prepare",
+        "suggestedBudgetShiftPct": 60,
+        "confidence": 95,
+        "rainBrake": false,
+        "blockers": [],
+        "warnings": [],
+        "sourceTrace": [
+          "DWD_POLLEN",
+          "OPEN_METEO_WEATHER",
+          "OPEN_METEO_AIR_QUALITY",
+          "GOOGLE_TRENDS_REGIONAL"
+        ],
+        "topPollen": {
+          "type": "Graeser",
+          "index03": 3,
+          "dwdRegion": "Brandenburg und Berlin"
+        },
+        "componentScores": {
+          "pollen": 100,
+          "weather": 95,
+          "airQuality": 7.7,
+          "demand": 50
+        },
+        "drivers": [
+          "high_pollen_pressure",
+          "comfortable_temperature",
+          "wind_spreads_pollen"
+        ],
+        "channelPlan": [
+          "programmatic_reserve",
+          "search_budget_ready",
+          "pharmacy_inventory_ping"
+        ],
+        "compliance": {
+          "targetingMode": "contextual_environmental_region",
+          "personalHealthDataUsed": false,
+          "individualHealthProfileUsed": false,
+          "humanApprovalRequired": true
+        }
+      },
+      {
+        "regionCode": "MV",
+        "regionName": "Mecklenburg-Vorpommern",
+        "targetDate": "2026-05-28",
+        "mediaIndex": 79.7,
+        "action": "prepare",
+        "suggestedBudgetShiftPct": 60,
+        "confidence": 95,
+        "rainBrake": false,
+        "blockers": [],
+        "warnings": [],
+        "sourceTrace": [
+          "DWD_POLLEN",
+          "OPEN_METEO_WEATHER",
+          "OPEN_METEO_AIR_QUALITY",
+          "GOOGLE_TRENDS_REGIONAL"
+        ],
+        "topPollen": {
+          "type": "Graeser",
+          "index03": 3,
+          "dwdRegion": "Mecklenburg-Vorpommern"
+        },
+        "componentScores": {
+          "pollen": 100,
+          "weather": 95,
+          "airQuality": 7.7,
+          "demand": 50
+        },
+        "drivers": [
+          "high_pollen_pressure",
+          "comfortable_temperature",
+          "wind_spreads_pollen"
+        ],
+        "channelPlan": [
+          "programmatic_reserve",
+          "search_budget_ready",
+          "pharmacy_inventory_ping"
+        ],
+        "compliance": {
+          "targetingMode": "contextual_environmental_region",
+          "personalHealthDataUsed": false,
+          "individualHealthProfileUsed": false,
+          "humanApprovalRequired": true
+        }
+      },
+      {
+        "regionCode": "SN",
+        "regionName": "Sachsen",
+        "targetDate": "2026-05-28",
+        "mediaIndex": 79.7,
+        "action": "prepare",
+        "suggestedBudgetShiftPct": 60,
+        "confidence": 95,
+        "rainBrake": false,
+        "blockers": [],
+        "warnings": [],
+        "sourceTrace": [
+          "DWD_POLLEN",
+          "OPEN_METEO_WEATHER",
+          "OPEN_METEO_AIR_QUALITY",
+          "GOOGLE_TRENDS_REGIONAL"
+        ],
+        "topPollen": {
+          "type": "Graeser",
+          "index03": 3,
+          "dwdRegion": "Sachsen"
+        },
+        "componentScores": {
+          "pollen": 100,
+          "weather": 95,
+          "airQuality": 8.3,
+          "demand": 50
+        },
+        "drivers": [
+          "high_pollen_pressure",
+          "comfortable_temperature",
+          "wind_spreads_pollen"
+        ],
+        "channelPlan": [
+          "programmatic_reserve",
+          "search_budget_ready",
+          "pharmacy_inventory_ping"
+        ],
+        "compliance": {
+          "targetingMode": "contextual_environmental_region",
+          "personalHealthDataUsed": false,
+          "individualHealthProfileUsed": false,
+          "humanApprovalRequired": true
+        }
+      },
+      {
+        "regionCode": "NW",
+        "regionName": "Nordrhein-Westfalen",
+        "targetDate": "2026-05-28",
+        "mediaIndex": 78.3,
+        "action": "prepare",
+        "suggestedBudgetShiftPct": 60,
+        "confidence": 95,
+        "rainBrake": false,
+        "blockers": [],
+        "warnings": [],
+        "sourceTrace": [
+          "DWD_POLLEN",
+          "OPEN_METEO_WEATHER",
+          "OPEN_METEO_AIR_QUALITY",
+          "GOOGLE_TRENDS_REGIONAL"
+        ],
+        "topPollen": {
+          "type": "Graeser",
+          "index03": 3,
+          "dwdRegion": "Nordrhein-Westfalen"
+        },
+        "componentScores": {
+          "pollen": 100,
+          "weather": 88,
+          "airQuality": 10.7,
+          "demand": 50
+        },
+        "drivers": [
+          "high_pollen_pressure",
+          "moderate_temperature",
+          "wind_spreads_pollen"
+        ],
+        "channelPlan": [
+          "programmatic_reserve",
+          "search_budget_ready",
+          "pharmacy_inventory_ping"
+        ],
+        "compliance": {
+          "targetingMode": "contextual_environmental_region",
+          "personalHealthDataUsed": false,
+          "individualHealthProfileUsed": false,
+          "humanApprovalRequired": true
+        }
+      },
+      {
+        "regionCode": "HB",
+        "regionName": "Bremen",
+        "targetDate": "2026-05-28",
+        "mediaIndex": 76.2,
+        "action": "prepare",
+        "suggestedBudgetShiftPct": 60,
+        "confidence": 95,
+        "rainBrake": false,
+        "blockers": [],
+        "warnings": [],
+        "sourceTrace": [
+          "DWD_POLLEN",
+          "OPEN_METEO_WEATHER",
+          "OPEN_METEO_AIR_QUALITY",
+          "GOOGLE_TRENDS_REGIONAL"
+        ],
+        "topPollen": {
+          "type": "Graeser",
+          "index03": 3,
+          "dwdRegion": "Niedersachsen und Bremen"
+        },
+        "componentScores": {
+          "pollen": 100,
+          "weather": 80,
+          "airQuality": 9.5,
+          "demand": 50
+        },
+        "drivers": [
+          "high_pollen_pressure",
+          "comfortable_temperature",
+          "dry_air"
+        ],
+        "channelPlan": [
+          "programmatic_reserve",
+          "search_budget_ready",
+          "pharmacy_inventory_ping"
+        ],
+        "compliance": {
+          "targetingMode": "contextual_environmental_region",
+          "personalHealthDataUsed": false,
+          "individualHealthProfileUsed": false,
+          "humanApprovalRequired": true
+        }
+      },
+      {
+        "regionCode": "NI",
+        "regionName": "Niedersachsen",
+        "targetDate": "2026-05-28",
+        "mediaIndex": 76.1,
+        "action": "prepare",
+        "suggestedBudgetShiftPct": 60,
+        "confidence": 95,
+        "rainBrake": false,
+        "blockers": [],
+        "warnings": [],
+        "sourceTrace": [
+          "DWD_POLLEN",
+          "OPEN_METEO_WEATHER",
+          "OPEN_METEO_AIR_QUALITY",
+          "GOOGLE_TRENDS_REGIONAL"
+        ],
+        "topPollen": {
+          "type": "Graeser",
+          "index03": 3,
+          "dwdRegion": "Niedersachsen und Bremen"
+        },
+        "componentScores": {
+          "pollen": 100,
+          "weather": 80,
+          "airQuality": 9.3,
+          "demand": 50
+        },
+        "drivers": [
+          "high_pollen_pressure",
+          "comfortable_temperature",
+          "dry_air"
+        ],
+        "channelPlan": [
+          "programmatic_reserve",
+          "search_budget_ready",
+          "pharmacy_inventory_ping"
+        ],
+        "compliance": {
+          "targetingMode": "contextual_environmental_region",
+          "personalHealthDataUsed": false,
+          "individualHealthProfileUsed": false,
+          "humanApprovalRequired": true
+        }
+      },
+      {
+        "regionCode": "SL",
+        "regionName": "Saarland",
+        "targetDate": "2026-05-28",
+        "mediaIndex": 74.5,
+        "action": "prepare",
+        "suggestedBudgetShiftPct": 60,
+        "confidence": 95,
+        "rainBrake": false,
+        "blockers": [],
+        "warnings": [],
+        "sourceTrace": [
+          "DWD_POLLEN",
+          "OPEN_METEO_WEATHER",
+          "OPEN_METEO_AIR_QUALITY",
+          "GOOGLE_TRENDS_REGIONAL"
+        ],
+        "topPollen": {
+          "type": "Graeser",
+          "index03": 3,
+          "dwdRegion": "Rheinland-Pfalz und Saarland"
+        },
+        "componentScores": {
+          "pollen": 100,
+          "weather": 73,
+          "airQuality": 9.9,
+          "demand": 50
+        },
+        "drivers": [
+          "high_pollen_pressure",
+          "moderate_temperature",
+          "dry_air"
+        ],
+        "channelPlan": [
+          "programmatic_reserve",
+          "search_budget_ready",
+          "pharmacy_inventory_ping"
+        ],
+        "compliance": {
+          "targetingMode": "contextual_environmental_region",
+          "personalHealthDataUsed": false,
+          "individualHealthProfileUsed": false,
+          "humanApprovalRequired": true
+        }
+      },
+      {
+        "regionCode": "HE",
+        "regionName": "Hessen",
+        "targetDate": "2026-05-28",
+        "mediaIndex": 74.4,
+        "action": "prepare",
+        "suggestedBudgetShiftPct": 60,
+        "confidence": 95,
+        "rainBrake": false,
+        "blockers": [],
+        "warnings": [],
+        "sourceTrace": [
+          "DWD_POLLEN",
+          "OPEN_METEO_WEATHER",
+          "OPEN_METEO_AIR_QUALITY",
+          "GOOGLE_TRENDS_REGIONAL"
+        ],
+        "topPollen": {
+          "type": "Graeser",
+          "index03": 3,
+          "dwdRegion": "Hessen"
+        },
+        "componentScores": {
+          "pollen": 100,
+          "weather": 73,
+          "airQuality": 9,
+          "demand": 50
+        },
+        "drivers": [
+          "high_pollen_pressure",
+          "moderate_temperature",
+          "dry_air"
+        ],
+        "channelPlan": [
+          "programmatic_reserve",
+          "search_budget_ready",
+          "pharmacy_inventory_ping"
+        ],
+        "compliance": {
+          "targetingMode": "contextual_environmental_region",
+          "personalHealthDataUsed": false,
+          "individualHealthProfileUsed": false,
+          "humanApprovalRequired": true
+        }
+      },
+      {
+        "regionCode": "RP",
+        "regionName": "Rheinland-Pfalz",
+        "targetDate": "2026-05-28",
+        "mediaIndex": 74.4,
+        "action": "prepare",
+        "suggestedBudgetShiftPct": 60,
+        "confidence": 95,
+        "rainBrake": false,
+        "blockers": [],
+        "warnings": [],
+        "sourceTrace": [
+          "DWD_POLLEN",
+          "OPEN_METEO_WEATHER",
+          "OPEN_METEO_AIR_QUALITY",
+          "GOOGLE_TRENDS_REGIONAL"
+        ],
+        "topPollen": {
+          "type": "Graeser",
+          "index03": 3,
+          "dwdRegion": "Rheinland-Pfalz und Saarland"
+        },
+        "componentScores": {
+          "pollen": 100,
+          "weather": 73,
+          "airQuality": 9.2,
+          "demand": 50
+        },
+        "drivers": [
+          "high_pollen_pressure",
+          "moderate_temperature",
+          "dry_air"
+        ],
+        "channelPlan": [
+          "programmatic_reserve",
+          "search_budget_ready",
+          "pharmacy_inventory_ping"
+        ],
+        "compliance": {
+          "targetingMode": "contextual_environmental_region",
+          "personalHealthDataUsed": false,
+          "individualHealthProfileUsed": false,
+          "humanApprovalRequired": true
+        }
+      },
+      {
+        "regionCode": "TH",
+        "regionName": "Thueringen",
+        "targetDate": "2026-05-28",
+        "mediaIndex": 34.7,
+        "action": "pause",
+        "suggestedBudgetShiftPct": -100,
+        "confidence": 95,
+        "rainBrake": false,
+        "blockers": [],
+        "warnings": [],
+        "sourceTrace": [
+          "DWD_POLLEN",
+          "OPEN_METEO_WEATHER",
+          "OPEN_METEO_AIR_QUALITY",
+          "GOOGLE_TRENDS_REGIONAL"
+        ],
+        "topPollen": {
+          "type": "unknown",
+          "index03": 0,
+          "dwdRegion": "Thueringen"
+        },
+        "componentScores": {
+          "pollen": 0,
+          "weather": 95,
+          "airQuality": 8,
+          "demand": 50
+        },
+        "drivers": [
+          "comfortable_temperature",
+          "wind_spreads_pollen"
+        ],
+        "channelPlan": [
+          "pause_paid_media",
+          "keep_organic_content"
+        ],
+        "compliance": {
+          "targetingMode": "contextual_environmental_region",
+          "personalHealthDataUsed": false,
+          "individualHealthProfileUsed": false,
+          "humanApprovalRequired": true
+        }
+      },
+      {
+        "regionCode": "BW",
+        "regionName": "Baden-Wuerttemberg",
+        "targetDate": "2026-05-28",
+        "mediaIndex": 33.3,
+        "action": "pause",
+        "suggestedBudgetShiftPct": -100,
+        "confidence": 95,
+        "rainBrake": false,
+        "blockers": [],
+        "warnings": [],
+        "sourceTrace": [
+          "DWD_POLLEN",
+          "OPEN_METEO_WEATHER",
+          "OPEN_METEO_AIR_QUALITY",
+          "GOOGLE_TRENDS_REGIONAL"
+        ],
+        "topPollen": {
+          "type": "unknown",
+          "index03": 0,
+          "dwdRegion": "Baden-Wuerttemberg"
+        },
+        "componentScores": {
+          "pollen": 0,
+          "weather": 88,
+          "airQuality": 10.1,
+          "demand": 50
+        },
+        "drivers": [
+          "moderate_temperature",
+          "wind_spreads_pollen"
+        ],
+        "channelPlan": [
+          "pause_paid_media",
+          "keep_organic_content"
+        ],
+        "compliance": {
+          "targetingMode": "contextual_environmental_region",
+          "personalHealthDataUsed": false,
+          "individualHealthProfileUsed": false,
+          "humanApprovalRequired": true
+        }
+      }
+    ]
+  }
+}
